@@ -4,9 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  css: {
-    postcss: false, // Disable PostCSS to avoid conflicts with Next.js
-  },
+  // No PostCSS config needed - build script handles it
   build: {
     outDir: 'public/widgets',
     emptyOutDir: false, // Don't clear public/widgets each time
