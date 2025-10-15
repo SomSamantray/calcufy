@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npm run build:widgets && next build",
-    "build:widgets": "mv postcss.config.mjs postcss.config.mjs.bak 2>/dev/null || true && vite build && mv postcss.config.mjs.bak postcss.config.mjs 2>/dev/null || true",
+    "build": "node scripts/build-widgets.js && next build",
+    "build:widgets": "node scripts/build-widgets.js",
     "start": "next start",
     "test:mcp": "curl http://localhost:3000/mcp"
   },
