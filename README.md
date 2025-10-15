@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Calcufy 🧮
 
-## Getting Started
+A beautiful calculator application built with Next.js and the Model Context Protocol (MCP) for seamless ChatGPT integration.
 
-First, run the development server:
+## 🌟 Features
+
+- **Interactive Calculator Carousel**: Swipeable cards for 4 operations (Add, Subtract, Multiply, Divide)
+- **Smart Input Forms**: Validated number inputs with real-time feedback
+- **Animated Results**: Beautiful result displays with confetti effects
+- **MCP Integration**: Full ChatGPT Apps SDK integration
+- **Responsive Design**: Works perfectly on mobile and desktop
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ installed
+- npm or pnpm package manager
+
+### Installation
 
 ```bash
+# Install dependencies
+npm install
+
+# Build widgets
+npm run build:widgets
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The server will start at `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📖 How to Use
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Local Development
 
-## Learn More
+1. Start the dev server: `npm run dev`
+2. Open `http://localhost:3000`
+3. Test the MCP endpoint: `curl http://localhost:3000/mcp`
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Test MCP Tools
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# Test show_calculator
+curl -X POST http://localhost:3000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"tool_name": "show_calculator", "arguments": {}}'
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Test calculate
+curl -X POST http://localhost:3000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"tool_name": "calculate", "arguments": {"operation": "add", "num1": 45, "num2": 30}}'
+```
 
-## Deploy on Vercel
+### 3. Connect to ChatGPT
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### Using MCP Inspector
+```bash
+npx @modelcontextprotocol/inspector
+```
+Then connect to: `http://localhost:3000/mcp`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🏗️ Project Structure
+
+```
+calcufy/
+├── app/
+│   ├── mcp/route.ts              # MCP server endpoint
+│   ├── layout.tsx                # Root layout
+│   └── page.tsx                  # Homepage
+├── components/
+│   └── widgets/                  # Widget components
+├── lib/
+│   ├── mcp/                      # MCP server code
+│   └── calculator/               # Calculator logic
+├── public/widgets/               # Built widget files
+├── baseUrl.ts                    # URL configuration
+└── middleware.ts                 # CORS handling
+```
+
+## 🔧 Available MCP Tools
+
+### 1. `show_calculator`
+Displays the calculator carousel with operation selection cards.
+
+### 2. `select_operation`
+Handles operation selection and displays input form.
+
+### 3. `calculate`
+Performs calculation and displays result.
+
+## 📝 User Flow
+
+1. User: "I want to use Calcufy"
+2. User clicks "Select" on an operation card
+3. User enters two numbers
+4. Result displays with animation
+
+## 🚢 Deployment
+
+Deploy to Vercel: [Vercel Platform](https://vercel.com/new)
+
+Set environment variable:
+```
+NEXT_PUBLIC_BASE_URL=https://your-app.vercel.app
+```
+
+## 📚 Technical Stack
+
+- Next.js 15+ with App Router
+- TypeScript 5+
+- MCP SDK
+- Tailwind CSS
+- Vite (for widgets)
+
+---
+
+Built with ❤️ using MCP and Next.js
