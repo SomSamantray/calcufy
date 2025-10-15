@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { ToolDefinition, ToolResult, CalculationError } from './types';
 import { getFullUrl } from '@/baseUrl';
-import { calculate, getOperationName, getOperationSymbol, Operation } from '@/lib/calculator/operations';
+import { calculate, getOperationName, Operation } from '@/lib/calculator/operations';
 
 /**
  * Tool 1: show_calculator

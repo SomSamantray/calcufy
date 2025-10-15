@@ -20,6 +20,28 @@ try {
   console.log('⚡ Running Vite build...');
   execSync('vite build', { stdio: 'inherit' });
   console.log('✅ Widgets built successfully!');
+
+  const outputDir = path.join(__dirname, '..', 'public', 'widgets');
+  const nestedWidgetsDir = path.join(outputDir, 'widgets');
+
+  if (fs.existsSync(nestedWidgetsDir)) {
+    console.log('🧹 Normalizing widget HTML output...');
+    const htmlFiles = fs.readdirSync(nestedWidgetsDir).filter((file) => file.endsWith('.html'));
+
+    htmlFiles.forEach((file) => {
+      const sourcePath = path.join(nestedWidgetsDir, file);
+      const destinationPath = path.join(outputDir, file);
+      let html = fs.readFileSync(sourcePath, 'utf8');
+
+      // Ensure asset links point to /widgets/* so they resolve in production
+      html = html.replace(/(src|href)="\/(?!widgets\/)/g, '$1="/widgets/');
+
+      fs.writeFileSync(destinationPath, html, 'utf8');
+    });
+
+    fs.rmSync(nestedWidgetsDir, { recursive: true, force: true });
+    console.log('📁 Moved widget HTML files to /public/widgets');
+  }
 } catch (error) {
   console.error('❌ Widget build failed:', error.message);
   process.exit(1);

@@ -11,13 +11,22 @@ export function middleware(request: NextRequest) {
 
   // Handle preflight OPTIONS request
   if (request.method === 'OPTIONS') {
+    const allowHeaders = [
+      'Content-Type',
+      'Accept',
+      'Authorization',
+      'X-Requested-With',
+      'X-MCP-Version',
+      'Mcp-Session-Id',
+      'Last-Event-ID',
+    ].join(', ');
+
     return new NextResponse(null, {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': origin || '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers':
-          'Content-Type, Authorization, X-Requested-With, X-MCP-Version',
+        'Access-Control-Allow-Headers': allowHeaders,
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Max-Age': '86400',
       },
@@ -33,7 +42,15 @@ export function middleware(request: NextRequest) {
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   response.headers.set(
     'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, X-Requested-With, X-MCP-Version'
+    [
+      'Content-Type',
+      'Accept',
+      'Authorization',
+      'X-Requested-With',
+      'X-MCP-Version',
+      'Mcp-Session-Id',
+      'Last-Event-ID',
+    ].join(', ')
   );
 
   // Add security headers
