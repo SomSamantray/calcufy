@@ -91,6 +91,7 @@ export async function POST(request: NextRequest) {
     // Handle JSON-RPC message(s)
     const messages = Array.isArray(body) ? body : [body];
     const responses: any[] = [];
+    let newSessionId: string | null = null;
 
     for (const message of messages) {
       const { jsonrpc, id, method, params } = message;
@@ -113,14 +114,19 @@ export async function POST(request: NextRequest) {
         switch (method) {
           case 'initialize':
             // Initialize session
-            const newSessionId = sessionId || generateSessionId();
+            newSessionId = sessionId || generateSessionId();
             sessions.set(newSessionId, { initialized: true, lastActivity: Date.now() });
 
             result = {
               protocolVersion: '2025-03-26',
               capabilities: {
-                tools: {},
-                resources: {},
+                tools: {
+                  list: {},
+                  call: {},
+                },
+                resources: {
+                  list: {},
+                },
               },
               serverInfo: {
                 name: 'Calcufy',
@@ -133,7 +139,6 @@ export async function POST(request: NextRequest) {
               jsonrpc: '2.0',
               id,
               result,
-              _sessionId: newSessionId,
             });
             break;
 
@@ -215,9 +220,8 @@ export async function POST(request: NextRequest) {
       };
 
       // Include session ID if this was initialize
-      const initResponse = responses.find(r => r._sessionId);
-      if (initResponse) {
-        headers['Mcp-Session-Id'] = initResponse._sessionId;
+      if (newSessionId) {
+        headers['Mcp-Session-Id'] = newSessionId;
       }
 
       return new NextResponse(stream, { headers });
@@ -231,9 +235,8 @@ export async function POST(request: NextRequest) {
       };
 
       // Include session ID if this was initialize
-      const initResponse = responses.find(r => r._sessionId);
-      if (initResponse) {
-        headers['Mcp-Session-Id'] = initResponse._sessionId;
+      if (newSessionId) {
+        headers['Mcp-Session-Id'] = newSessionId;
       }
 
       return NextResponse.json(response, { headers });
