@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     // Handle JSON-RPC message(s)
     const messages = Array.isArray(body) ? body : [body];
-    const responses = [];
+    const responses: any[] = [];
 
     for (const message of messages) {
       const { jsonrpc, id, method, params } = message;
