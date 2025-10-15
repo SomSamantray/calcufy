@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
       }
 
       try {
-        let result;
+        let result: any;
 
         switch (method) {
           case 'initialize':
