@@ -35,18 +35,25 @@ export async function GET(request: NextRequest) {
 
   console.log('[MCP] GET request - Session:', sessionId, 'Last-Event:', lastEventId);
 
+  let activeSessionId = sessionId || generateSessionId();
+  const isNewSession = !sessionId || !sessions.has(activeSessionId);
+
+  const existingSession = sessions.get(activeSessionId);
+
+  if (existingSession) {
+    existingSession.lastActivity = Date.now();
+  } else {
+    sessions.set(activeSessionId, { initialized: false, lastActivity: Date.now() });
+  }
+
   // Create SSE stream
   const stream = new ReadableStream({
     start(controller) {
       const encoder = new TextEncoder();
 
       // Send session ID if new session
-      if (!sessionId) {
-        const newSessionId = generateSessionId();
-        sessions.set(newSessionId, { initialized: false, lastActivity: Date.now() });
-
-        // SSE event format
-        const event = `event: session\ndata: ${JSON.stringify({ sessionId: newSessionId })}\n\n`;
+      if (isNewSession) {
+        const event = `event: session\ndata: ${JSON.stringify({ sessionId: activeSessionId })}\n\n`;
         controller.enqueue(encoder.encode(event));
       }
 
@@ -69,7 +76,8 @@ export async function GET(request: NextRequest) {
       'Cache-Control': 'no-cache, no-transform',
       'Connection': 'keep-alive',
       'X-Accel-Buffering': 'no',
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
+      'Mcp-Session-Id': activeSessionId,
     },
   });
 }
@@ -83,6 +91,7 @@ export async function POST(request: NextRequest) {
     const sessionId = request.headers.get('mcp-session-id');
     const acceptHeader = request.headers.get('accept') || '';
     const wantsSSE = acceptHeader.includes('text/event-stream');
+    const origin = request.headers.get('origin') || '*';
 
     console.log('[MCP] POST request - Session:', sessionId, 'Wants SSE:', wantsSSE);
 
@@ -216,7 +225,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache, no-transform',
         'Connection': 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': origin,
       };
 
       // Include session ID if this was initialize
@@ -231,7 +240,7 @@ export async function POST(request: NextRequest) {
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': origin,
       };
 
       // Include session ID if this was initialize
